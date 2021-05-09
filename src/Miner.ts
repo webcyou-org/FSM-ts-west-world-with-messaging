@@ -2,6 +2,7 @@ import { BaseGameEntity } from './BaseGameEntity'
 import { StateMachine } from './Common/FSM/StateMachine'
 import { LOCATION_TYPE } from './Locations'
 import { GoHomeAndSleepTilRested } from './MinerOwnedStates'
+import { Telegram } from './Common/Messaging/Telegram'
 
 // 鉱夫が安心して採掘するために必要な金塊の量
 export const COMFORT_LEVEL: number = 5;
@@ -97,5 +98,9 @@ export class Miner extends BaseGameEntity {
 
     isFatigued(): boolean {
         return (this._fatigue > TIREDNESS_THRESHOLD);
+    }
+
+    handleMessage(msg: Telegram): boolean {
+        return this._stateMachine.handleMessage(msg);
     }
 }

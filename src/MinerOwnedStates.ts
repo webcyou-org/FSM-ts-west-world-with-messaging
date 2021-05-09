@@ -1,10 +1,18 @@
+import { ENTITY_NAMES } from "./EntityNames"
 import { State } from './Common/FSM/State'
 import { Miner, COMFORT_LEVEL } from './Miner'
 import { LOCATION_TYPE } from './Locations'
 import { GetNameOfEntity } from './EntityNames'
+import { Telegram } from './Common/Messaging/Telegram'
+import { MESSAGE_TYPE } from './MessageTypes'
+import { MessageDispatcher, NO_ADDITIONAL_INFO, SEND_MSG_IMMEDIATELY } from './MessageDispatcher'
+import { CrudeTimer } from './Common/Time/CrudeTimer'
 
 import chalk from 'chalk';
 const log = console.log;
+
+const dispatch: MessageDispatcher = MessageDispatcher.getInstance();
+const crudeTimer: CrudeTimer = CrudeTimer.getInstance();
 
 
 // 金鉱に入り金塊を掘る
@@ -54,6 +62,10 @@ export class EnterMineAndDigForNugget implements State {
     exit(miner: Miner): void {
         log(chalk`{red ${GetNameOfEntity(miner.ID)}: 金塊でポケットを一杯にして金鉱から離れています}`);
     }
+
+    onMessage(miner: Miner, msg: Telegram): boolean {
+        return false;
+    }
 }
 
 
@@ -102,6 +114,10 @@ export class VisitBankAndDepositGold implements State {
     exit(miner: Miner): void {
         log(chalk`{red ${GetNameOfEntity(miner.ID)}: 銀行から離れています}`);
     }
+
+    onMessage(miner: Miner, msg: Telegram): boolean {
+        return false;
+    }
 }
 
 
@@ -127,6 +143,14 @@ export class GoHomeAndSleepTilRested implements State {
         if (miner.location != LOCATION_TYPE.SHACK) {
             log(chalk`{red ${GetNameOfEntity(miner.ID)}: 家に向かっています}`);
             miner.changeLocation = LOCATION_TYPE.SHACK;
+
+            dispatch.dispatchMessage(
+                SEND_MSG_IMMEDIATELY,
+                miner.ID,
+                ENTITY_NAMES.ENT_ELSA,
+                MESSAGE_TYPE.MSG_HI_HONEY_IM_HOME,
+                NO_ADDITIONAL_INFO
+            );
         }
     }
 
@@ -143,6 +167,22 @@ export class GoHomeAndSleepTilRested implements State {
 
     exit(miner: Miner): void {
         log(chalk`{red ${GetNameOfEntity(miner.ID)}: 家から離れています}`);
+    }
+
+    onMessage(miner: Miner, msg: Telegram): boolean {
+        // SetTextColor(BACKGROUND_RED|FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
+
+        switch(msg.msg) {
+            case MESSAGE_TYPE.MSG_STEW_READY:
+                log(`Message handled by ${GetNameOfEntity(miner.ID)} at time: ${crudeTimer.currentTime}`);
+
+                // SetTextColor(FOREGROUND_RED|FOREGROUND_INTENSITY);
+                log(`${GetNameOfEntity(miner.ID)} : Okay Hun, ahm a comin'!`);
+
+                miner.FSM.changeState(EatStew.getInstance());
+                return true;
+        }
+        return false;
     }
 }
 
@@ -184,5 +224,45 @@ export class QuenchThirst implements State {
 
     exit(miner: Miner): void {
         log(chalk`{red ${GetNameOfEntity(miner.ID)}: 酒場を離れています。良い気分です}`);
+    }
+
+    onMessage(miner: Miner, msg: Telegram): boolean {
+        return false;
+    }
+}
+
+
+export class EatStew implements State {
+    private static _instance: EatStew | null = null;
+
+    constructor() {
+        if (EatStew._instance) {
+            throw new Error("must use the getInstance.");
+        }
+        EatStew._instance = this;
+    }
+
+    public static getInstance(): EatStew {
+        if(EatStew._instance === null) {
+            EatStew._instance = new EatStew();
+        }
+        return EatStew._instance;
+    }
+
+    enter(miner: Miner): void {
+        log(chalk`{red ${GetNameOfEntity(miner.ID)}: Smells Reaaal goood Elsa!}`);
+    }
+
+    execute(miner: Miner): void {
+        log(chalk`{red ${GetNameOfEntity(miner.ID)}: Tastes real good too!}`);
+        miner.FSM.revertToPreviousState();
+    }
+
+    exit(miner: Miner): void {
+        log(chalk`{red ${GetNameOfEntity(miner.ID)}: Thankya li'lle lady. Ah better get back to whatever ah wuz doin'}`);
+    }
+
+    onMessage(miner: Miner, msg: Telegram): boolean {
+        return false;
     }
 }

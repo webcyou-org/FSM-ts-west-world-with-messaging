@@ -1,4 +1,5 @@
 import { State } from './State'
+import { Telegram } from '../Messaging/Telegram'
 
 export class StateMachine {
     // このインスタンスを所有するエージェント
@@ -40,6 +41,15 @@ export class StateMachine {
         if (this._globalState) this._globalState.execute(this._owner);
         // 現在のステートと同じ
         if (this._currentState) this._currentState.execute(this._owner);
+    }
+
+    handleMessage(msg: Telegram): boolean {
+        //first see if the current state is valid and that it can handle
+        //the message
+        return Boolean(this._currentState) && this._currentState!.onMessage(this._owner, msg) ||
+            //if not, and if a global state has been implemented, send
+            //the message to the global state
+            Boolean(this._globalState) && this._globalState!.onMessage(this._owner, msg)
     }
 
     // 新しいステートに変更

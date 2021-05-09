@@ -2,10 +2,12 @@ import { BaseGameEntity } from './BaseGameEntity'
 import { StateMachine } from './Common/FSM/StateMachine'
 import { LOCATION_TYPE } from './Locations'
 import { DoHouseWork, WifesGlobalState } from './MinersWifeOwnedStates'
+import { Telegram } from './Common/Messaging/Telegram'
 
 export class MinersWife extends BaseGameEntity {
     private _stateMachine: StateMachine;
     private _location: LOCATION_TYPE;
+    private _cooking: boolean = false;
 
     constructor(id: number) {
         super(id);
@@ -30,5 +32,17 @@ export class MinersWife extends BaseGameEntity {
 
     update(): void {
         this._stateMachine.update();
+    }
+
+    get cooking(): boolean {
+        return this._cooking;
+    }
+
+    set cooking(val: boolean) {
+        this._cooking = val;
+    }
+
+    handleMessage(msg: Telegram): boolean {
+        return this._stateMachine!.handleMessage(msg);
     }
 }

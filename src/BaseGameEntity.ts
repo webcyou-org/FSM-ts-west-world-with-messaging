@@ -1,3 +1,5 @@
+import { Telegram } from './Common/Messaging/Telegram'
+
 export class BaseGameEntity {
     // どのエンティティも一意のID番号を持つ
     private _ID: number = 0;
@@ -20,4 +22,7 @@ export class BaseGameEntity {
     get ID(): number {
         return this._ID;
     }
+
+    // すべてのサブクラスはメッセージを使って通信する
+    handleMessage(msg: Telegram): boolean { return false }
 }
