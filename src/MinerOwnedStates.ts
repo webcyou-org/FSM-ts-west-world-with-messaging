@@ -104,7 +104,7 @@ export class VisitBankAndDepositGold implements State {
 
         // リッチな状態であれば、休息をとる
         if (miner.wealth() >= COMFORT_LEVEL) {
-            log(chalk`{red ${GetNameOfEntity(miner.ID)}: やった！今のところ十分リッチになった。奥さんが待っている家へ帰ります}`);
+            log(chalk`{red ${GetNameOfEntity(miner.ID)}: うおー！今日はもう十分稼いだ。可愛い奥さんがいる家へ帰ろう}`);
             miner.FSM.changeState(GoHomeAndSleepTilRested.getInstance());
         } else {
             miner.FSM.changeState(EnterMineAndDigForNugget.getInstance());
@@ -170,14 +170,11 @@ export class GoHomeAndSleepTilRested implements State {
     }
 
     onMessage(miner: Miner, msg: Telegram): boolean {
-        // SetTextColor(BACKGROUND_RED|FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
-
         switch(msg.msg) {
             case MESSAGE_TYPE.MSG_STEW_READY:
-                log(`Message handled by ${GetNameOfEntity(miner.ID)} at time: ${crudeTimer.currentTime}`);
-
-                // SetTextColor(FOREGROUND_RED|FOREGROUND_INTENSITY);
-                log(`${GetNameOfEntity(miner.ID)} : Okay Hun, ahm a comin'!`);
+                let logMessage = `時刻${crudeTimer.currentTime}にメッセージが${GetNameOfEntity(miner.ID)}に受信されました`
+                log(chalk.bgRed(logMessage));
+                log(chalk`{red ${GetNameOfEntity(miner.ID)}: OK。今行くよ！}`);
 
                 miner.FSM.changeState(EatStew.getInstance());
                 return true;
@@ -250,16 +247,16 @@ export class EatStew implements State {
     }
 
     enter(miner: Miner): void {
-        log(chalk`{red ${GetNameOfEntity(miner.ID)}: Smells Reaaal goood Elsa!}`);
+        log(chalk`{red ${GetNameOfEntity(miner.ID)}: 本当に良い匂いだ、エルザ！}`);
     }
 
     execute(miner: Miner): void {
-        log(chalk`{red ${GetNameOfEntity(miner.ID)}: Tastes real good too!}`);
+        log(chalk`{red ${GetNameOfEntity(miner.ID)}: 本当においしいな！}`);
         miner.FSM.revertToPreviousState();
     }
 
     exit(miner: Miner): void {
-        log(chalk`{red ${GetNameOfEntity(miner.ID)}: Thankya li'lle lady. Ah better get back to whatever ah wuz doin'}`);
+        log(chalk`{red ${GetNameOfEntity(miner.ID)}: 本当にありがとう。帰ってきてよかったよ}`);
     }
 
     onMessage(miner: Miner, msg: Telegram): boolean {

@@ -7,7 +7,6 @@ import { CrudeTimer } from './Common/Time/CrudeTimer'
 
 const entityManager: EntityManager = EntityManager.getInstance();
 const dispatch: MessageDispatcher = MessageDispatcher.getInstance();
-const crudeTimer: CrudeTimer = CrudeTimer.getInstance();
 
 function sleep(milliseconds: number) {
     return new Promise<void>(resolve => {
@@ -16,6 +15,7 @@ function sleep(milliseconds: number) {
 }
 
 async function main() {
+    const crudeTimer: CrudeTimer = CrudeTimer.getInstance();
     const bob = new Miner(ENTITY_NAMES.ENT_MINER_BOB);
     const elsa = new MinersWife(ENTITY_NAMES.ENT_ELSA);
 

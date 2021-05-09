@@ -50,8 +50,7 @@ export class MessageDispatcher {
 
         //make sure the receiver is valid
         if (!_receiver) {
-            // cout << "\nWarning! No Receiver with ID of " << receiver << " found";
-            log(`Warning! No Receiver with ID of ${_receiver} found`);
+            log(`警告! ${_receiver}のIDを持つレシーバーが見つかりません`);
             return;
         }
 
@@ -59,7 +58,8 @@ export class MessageDispatcher {
         const telegram: Telegram = new Telegram(0, sender, receiver, msg, extraInfo);
         // if there is no delay, route telegram immediately
         if (delay <= 0.0) {
-            log(`Instant telegram dispatched at time: ${crudeTimer.currentTime} by ${GetNameOfEntity(_sender.ID)} for ${GetNameOfEntity(_receiver.ID)}. Msg is ${msgToStr(msg)}`);
+            let logMessage = `時刻${crudeTimer.currentTime}に、「${GetNameOfEntity(_sender.ID)}」から「${GetNameOfEntity(_receiver.ID)}」にインスタントTelegramが送信されました。メッセージは${msgToStr(msg)}です。`
+            log(chalk.bgRed(logMessage));
 
             // send the telegram to the recipient
             this.discharge(_receiver, telegram);
@@ -69,7 +69,8 @@ export class MessageDispatcher {
 
             //and put it in the queue
             this._priorityQ.unshift(telegram);
-            log(`Delayed telegram from ${GetNameOfEntity(_sender.ID)} recorded at time ${currentTime} for ${GetNameOfEntity(_receiver.ID)}. Msg is ${msgToStr(msg)}`)
+            let logMessage = `時刻${currentTime}に、「${GetNameOfEntity(_sender.ID)}」から「${GetNameOfEntity(_receiver.ID)}」に遅延Telegramが記録されました。メッセージは${msgToStr(msg)}です。`;
+            log(chalk.bgRed(logMessage));
         }
     }
 
@@ -92,8 +93,8 @@ export class MessageDispatcher {
 
             // find the recipient
             const _receiver: BaseGameEntity = entityManager.getEntityFromID(telegram.receiver);
-
-            log(`Queued telegram ready for dispatch: Sent to ${GetNameOfEntity(_receiver.ID)}. Msg is ${msgToStr(telegram.msg)}`)
+            const logMessage = `キューのTelegramを${GetNameOfEntity(_receiver.ID)}に送信する準備ができました。メッセージは${msgToStr(telegram.msg)}です`;
+            log(chalk.bgRed(logMessage));
 
             // send the telegram to the recipient
             this.discharge(_receiver, telegram);

@@ -41,17 +41,13 @@ export class WifesGlobalState implements State {
     exit(wife: MinersWife): void {}
 
     onMessage(wife: MinersWife, msg: Telegram): boolean {
-        // SetTextColor(BACKGROUND_RED|FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
         switch (msg.msg) {
             case MESSAGE_TYPE.MSG_HI_HONEY_IM_HOME:
-                let logMessage = `Message handled by ${GetNameOfEntity(wife.ID)} at time: ${crudeTimer.currentTime}`;
-                log(chalk`{green ${logMessage}}`);
-
-                // SetTextColor(FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-                log(chalk`{green ${GetNameOfEntity(wife.ID)}: Hi honey. Let me make you some of mah fine country stew}`);
+                let logMessage = `時刻${crudeTimer.currentTime}にメッセージが${GetNameOfEntity(wife.ID)}に受信されました`;
+                log(chalk.bgRed(logMessage));
+                log(chalk`{green ${GetNameOfEntity(wife.ID)}: あなた〜。あなたにおいしい自慢のシチューを作るわ}`);
 
                 wife.FSM.changeState(CookStew.getInstance());
-
                 return true;
         }
         return false;
@@ -151,18 +147,12 @@ export class CookStew implements State {
     }
 
     enter(wife: MinersWife): void {
-        //if not already cooking put the stew in the oven
+        // if not already cooking put the stew in the oven
         if (!wife.cooking) {
-            log(chalk`{green ${GetNameOfEntity(wife.ID)}: Putting the stew in the oven}`);
+            log(chalk`{green ${GetNameOfEntity(wife.ID)}: シチューをオーブンに入れます}`);
 
             //send a delayed message myself so that I know when to take the stew
             //out of the oven
-            // Dispatch->DispatchMessage(1.5,                  //time delay
-            //     wife->ID(),           //sender ID
-            //     wife->ID(),           //receiver ID
-            //     Msg_StewReady,        //msg
-            //     NO_ADDITIONAL_INFO);
-
             dispatch.dispatchMessage(1.5, wife.ID, wife.ID, MESSAGE_TYPE.MSG_STEW_READY, NO_ADDITIONAL_INFO);
             wife.cooking = true;
         }
@@ -171,22 +161,19 @@ export class CookStew implements State {
     }
 
     execute(wife: MinersWife): void {
-        log(chalk`{green ${GetNameOfEntity(wife.ID)}: Fussin' over food}`);
+        log(chalk`{green ${GetNameOfEntity(wife.ID)}: 煮込みすぎないようにしなきゃ}`);
     }
 
     exit(wife: MinersWife): void {
-        log(chalk`{green ${GetNameOfEntity(wife.ID)}: Puttin' the stew on the table}`);
+        log(chalk`{green ${GetNameOfEntity(wife.ID)}: シチューをテーブルの上に乗せる}`);
     }
 
     onMessage(wife: MinersWife, msg: Telegram): boolean {
-        // SetTextColor(BACKGROUND_RED|FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
-
         switch(msg.msg) {
             case MESSAGE_TYPE.MSG_STEW_READY:
-                log(`Message received by ${GetNameOfEntity(wife.ID)} at time: ${crudeTimer.currentTime}`);
-
-                // SetTextColor(FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-                log(`${GetNameOfEntity(wife.ID)} : StewReady! Lets eat`);
+                const logMessage = `時刻${crudeTimer.currentTime}にメッセージが${GetNameOfEntity(wife.ID)}に受信されました`;
+                log(chalk.bgRed(logMessage));
+                log(chalk`{green ${GetNameOfEntity(wife.ID)}: シチューができたわよ！食べましょう}`);
 
                 dispatch.dispatchMessage(
                     SEND_MSG_IMMEDIATELY,
