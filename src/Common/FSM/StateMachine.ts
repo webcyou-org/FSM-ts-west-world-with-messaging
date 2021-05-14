@@ -44,11 +44,8 @@ export class StateMachine {
     }
 
     handleMessage(msg: Telegram): boolean {
-        //first see if the current state is valid and that it can handle
-        //the message
+        // _currentStateと_globalStateの有効性確認
         return Boolean(this._currentState) && this._currentState!.onMessage(this._owner, msg) ||
-            //if not, and if a global state has been implemented, send
-            //the message to the global state
             Boolean(this._globalState) && this._globalState!.onMessage(this._owner, msg)
     }
 

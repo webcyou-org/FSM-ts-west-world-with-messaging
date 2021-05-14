@@ -147,12 +147,11 @@ export class CookStew implements State {
     }
 
     enter(wife: MinersWife): void {
-        // if not already cooking put the stew in the oven
+        // シチューをまだ作っていない場合は、オーブンに入れる。
         if (!wife.cooking) {
             log(chalk`{green ${GetNameOfEntity(wife.ID)}: シチューをオーブンに入れます}`);
 
-            //send a delayed message myself so that I know when to take the stew
-            //out of the oven
+            // オーブンからシチューを取り出すタイミングを知るために、自分で遅延メッセージを送る。
             dispatch.dispatchMessage(1.5, wife.ID, wife.ID, MESSAGE_TYPE.MSG_STEW_READY, NO_ADDITIONAL_INFO);
             wife.cooking = true;
         }

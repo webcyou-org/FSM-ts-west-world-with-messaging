@@ -26,7 +26,7 @@ async function main() {
         bob.update();
         elsa.update();
 
-        //dispatch any delayed messages
+        // 遅延したメッセージの送信
         dispatch.dispatchDelayedMessages();
 
         await sleep(800);
