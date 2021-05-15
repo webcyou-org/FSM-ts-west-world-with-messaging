@@ -50,7 +50,7 @@ export class StateMachine {
     }
 
     // 新しいステートに変更
-    changeState(newState: State) {
+    changeState(newState: State): void {
         if (!newState || !this._currentState) {
             throw new Error("NULLステートに変更しようとしています");
         }
